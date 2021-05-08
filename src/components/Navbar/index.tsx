@@ -9,12 +9,14 @@ import {
 import Img from "components/Img";
 import MenuLink from "components/MenuLink";
 import { SearchBar } from "components/SearchBar";
+import { useUserContext } from "contexts/user-context";
 import React, { useState } from "react";
 
 interface NavbarProps {}
 
 const Navbar = (props: NavbarProps) => {
   const [showMobileMenu, setShowMobileMenu] = useState<boolean>(false);
+  const { user } = useUserContext();
   return (
     <div>
       <nav className="bg-dark-blue-gray p-3.5 lg:px-8">
@@ -63,13 +65,15 @@ const Navbar = (props: NavbarProps) => {
               <PlusIcon className="fill-current" />
               <CaretDownIcon className="fill-current ml-0.5" size="7" />
             </a>
-            <a
-              href="#!"
-              className="hidden md:inline-flex items-center p-1 text-white"
-            >
-              <Img src="/dami.png" size="5" />
-              <CaretDownIcon className="fill-current ml-1" size="7" />
-            </a>
+            {user && (
+              <a
+                href="#!"
+                className="hidden md:inline-flex items-center p-1 text-white"
+              >
+                <Img src={user.avatar_url} size="5" />
+                <CaretDownIcon className="fill-current ml-1" size="7" />
+              </a>
+            )}
           </div>
         </div>
         {showMobileMenu && (
@@ -84,10 +88,12 @@ const Navbar = (props: NavbarProps) => {
               <MenuLink label="Codespaces" />
               <MenuLink label="Sponsors" />
               <MenuLink label="Settings" />
-              <MenuLink
-                label="Dami-js"
-                icon={<Img src="/dami.png" size="5" />}
-              />
+              {user && (
+                <MenuLink
+                  label="Dami-js"
+                  icon={<Img src={user.avatar_url} size="5" />}
+                />
+              )}
               <MenuLink label="Sign out" icon={<Exit />} />
             </div>
           </div>
