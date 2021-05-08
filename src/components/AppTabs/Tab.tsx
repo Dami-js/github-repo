@@ -1,9 +1,11 @@
 import { BarChartIcon, BookIcon, CubeIcon, DiaryIcon } from "components/icons";
+import { useUserContext } from "contexts/user-context";
 import React, { PropsWithChildren } from "react";
 
 interface TabProps {}
 
 export const Tab = ({ children }: PropsWithChildren<TabProps>) => {
+  const { repos } = useUserContext();
   return (
     <div className="flex items-center overflow-x-auto">
       <a
@@ -19,9 +21,11 @@ export const Tab = ({ children }: PropsWithChildren<TabProps>) => {
       >
         <DiaryIcon className="fill-current mr-2 hidden md:block" />
         Repositories
-        <span className="bg-gray-200 ml-2 font-light py-0.5 px-1.5 text-xs rounded-lg">
-          40
-        </span>
+        {repos && (
+          <span className="bg-gray-200 ml-2 font-light py-0.5 px-1.5 text-xs rounded-lg">
+            {repos.length}
+          </span>
+        )}
       </a>
       <a
         href="#!"
