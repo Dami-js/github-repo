@@ -1,5 +1,5 @@
 import { CheckIcon } from "components/icons";
-import React, { PropsWithChildren } from "react";
+import React from "react";
 
 interface FilterModalContentItemProps {
   labelText?: string;

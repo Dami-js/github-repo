@@ -1,4 +1,10 @@
-import React, { LegacyRef, PropsWithChildren, useEffect, useRef } from "react";
+import React, {
+  LegacyRef,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 
 interface ModalContainerProps {}
 
@@ -23,13 +29,19 @@ const Modal = ({
 }: PropsWithChildren<ModalProps>) => {
   const modalContentRef = useRef<LegacyRef<HTMLDivElement> | any>();
 
-  const globalListener = (e: MouseEvent) => {
-    if (modalContentRef.current && modalContentRef.current.contains(e.target)) {
-      return;
-    }
-    onClose();
-    document.removeEventListener("click", globalListener);
-  };
+  const globalListener = useCallback(
+    (e: MouseEvent) => {
+      if (
+        modalContentRef.current &&
+        modalContentRef.current.contains(e.target)
+      ) {
+        return;
+      }
+      onClose();
+      document.removeEventListener("click", globalListener);
+    },
+    [onClose]
+  );
 
   useEffect(() => {
     if (modalContentRef.current) {
@@ -38,7 +50,7 @@ const Modal = ({
     return () => {
       document.removeEventListener("click", globalListener);
     };
-  }, [isVisible, modalContentRef]);
+  }, [isVisible, modalContentRef, globalListener]);
 
   return (
     <>

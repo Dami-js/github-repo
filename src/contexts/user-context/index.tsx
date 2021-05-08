@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   createContext,
   Dispatch,
@@ -7,7 +8,8 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useFetch } from "utils";
+import * as R from "ramda";
+import * as _ from "lodash";
 import { API_URL } from "utils/constants";
 
 type HandleFilterOptions = {
@@ -26,12 +28,12 @@ interface UserContextProps {
   sort: string | undefined;
   language: string | undefined;
   loadingRepo: boolean;
-  setType: Dispatch<SetStateAction<string>>;
-  setSort: Dispatch<SetStateAction<string>>;
-  setQuery: Dispatch<SetStateAction<string>>;
   setLanguage: Dispatch<SetStateAction<string>>;
+  setUser: Dispatch<any>;
   handleFilter: (args: Partial<HandleFilterOptions>) => void;
   handleSearch: (q: string) => any;
+  fetchUserData: () => void;
+  fetchRepos: () => void;
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
@@ -42,21 +44,13 @@ const UserProvider = ({ children }: PropsWithChildren<UserProviderProps>) => {
   const [user, setUser] = useState<any>({});
   const [repos, setRepos] = useState<any[]>([]);
   const [type, setType] = useState<string>("");
-  const [query, setQuery] = useState<string>("");
   const [sort, setSort] = useState<string>("updated");
   const [language, setLanguage] = useState<string>("");
-  const { fetch, data, error, loading } = useFetch({
-    url: `${API_URL}/Dami-js`,
-  });
-
-  const {
-    fetch: fetchRepo,
-    data: dataRepo,
-    error: errorRepo,
-    loading: loadingRepo,
-  } = useFetch({
-    url: `${API_URL}/Dami-js/repos?type=${type}&language=${language}&sort=${sort}`,
-  });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [loadingRepo, setLoadingRepo] = useState<boolean>(false);
+  const [errorRepo, setErrorRepo] = useState<boolean>(false);
+  const repoUrl = `${API_URL}/Dami-js/repos?type=${type}&language=${language}&sort=${sort}`;
 
   const handleFilter = (args: Partial<HandleFilterOptions>) => {
     setType(`${args.type ?? type}`);
@@ -64,35 +58,64 @@ const UserProvider = ({ children }: PropsWithChildren<UserProviderProps>) => {
     setLanguage(`${args.language ?? language}`);
   };
 
-  const handleSearch = () => {};
+  const fetchUserData = async () => {
+    const url = `${API_URL}/Dami-js`;
+    try {
+      setLoading(true);
+      const response = await axios.get(url);
+      const { data } = response;
+      setUser(data);
+      setLoading(false);
+    } catch (err) {
+      console.log(error);
+      setError(true);
+      setLoading(false);
+    }
+  };
+
+  const fetchRepos = async () => {
+    try {
+      setLoadingRepo(true);
+      const response = await axios.get(repoUrl);
+      const { data } = response;
+      setRepos(data);
+      setLoadingRepo(false);
+    } catch (err) {
+      console.log(err);
+      setErrorRepo(true);
+      setLoadingRepo(false);
+    }
+  };
+
+  const search = async (query: string) => {
+    try {
+      const response = await axios.get(repoUrl);
+      if (!R.isEmpty(query)) {
+        const data = [...response.data];
+        const result = data.filter((item) =>
+          R.toLower(item.name).includes(R.toLower(query))
+        );
+        setRepos(result);
+      } else {
+        setRepos([...response.data]);
+      }
+    } catch (error) {
+      setRepos([]);
+      setErrorRepo(true);
+    }
+  };
+
+  const handleSearch = _.debounce(search, 500);
 
   useEffect(() => {
-    fetch();
+    fetchUserData();
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
-    const data = [...repos];
-    if (!query) {
-      fetchRepo();
-    }
-    const result = query
-      ? data.filter((item) => item.name.includes(query))
-      : data;
-    console.log(result);
-    setRepos(result);
-  }, [query]);
-
-  useEffect(() => {
-    fetchRepo();
-  }, [type, sort, language]);
-
-  useEffect(() => {
-    setUser(data);
-  }, [data]);
-
-  useEffect(() => {
-    setRepos(dataRepo);
-  }, [dataRepo]);
+    fetchRepos();
+    // eslint-disable-next-line
+  }, [type, language, sort]);
 
   return (
     <UserContext.Provider
@@ -103,15 +126,15 @@ const UserProvider = ({ children }: PropsWithChildren<UserProviderProps>) => {
         repos,
         errorRepo,
         loadingRepo,
-        handleFilter,
         type,
         sort,
         language,
-        setType,
-        setSort,
-        setLanguage,
         handleSearch,
-        setQuery,
+        handleFilter,
+        setLanguage,
+        fetchUserData,
+        fetchRepos,
+        setUser,
       }}
     >
       {children}

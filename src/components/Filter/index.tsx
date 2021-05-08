@@ -1,7 +1,7 @@
 import Button from "components/Button";
 import FilterModalContentItem from "components/FilterModalContentItem";
 import FilterModalContent from "components/FilterModalContent";
-import { CaretDownIcon, CheckIcon, DiaryIcon } from "components/icons";
+import { CaretDownIcon, DiaryIcon } from "components/icons";
 import Modal, { ModalContainer } from "components/Modal";
 import { Input } from "components/TextField";
 import React, { useState } from "react";
@@ -12,15 +12,33 @@ export const Filter = () => {
   const [showLangModal, setShowLangModal] = useState<boolean>(false);
   const [showSortModal, setShowSortModal] = useState<boolean>(false);
 
-  const {
-    language,
-    type,
-    sort,
-    setQuery,
-    handleFilter,
-    setSort,
-    setType,
-  } = useUserContext();
+  const { language, type, sort, handleSearch, handleFilter } = useUserContext();
+
+  type FilterOption = {
+    type?: string;
+    language?: string;
+    sort?: string;
+  };
+
+  const filterRepo = (
+    filterOption: FilterOption,
+    modalKey: "type" | "lang" | "sort"
+  ) => {
+    handleFilter(filterOption);
+    switch (modalKey) {
+      case "type":
+        setShowTypeModal(false);
+        break;
+      case "lang":
+        setShowLangModal(false);
+        break;
+      case "sort":
+        setShowSortModal(false);
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <div className="flex flex-col flex-wrap md:flex-row">
@@ -28,7 +46,7 @@ export const Filter = () => {
         <div className="flex-auto ">
           <Input
             placeholder="Find a repository..."
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => handleSearch(`${e.target.value}`)}
           />
         </div>
         <div className="flex items-center mt-4 lg:mt-0 lg:ml-4">
@@ -46,38 +64,38 @@ export const Filter = () => {
                 handleClose={() => setShowTypeModal(false)}
               >
                 <FilterModalContentItem
-                  isSelected={type === "all"}
-                  handleClick={() => handleFilter({ type: "all" })}
+                  isSelected={type === ""}
+                  handleClick={() => filterRepo({ type: "" }, "type")}
                   labelText="All"
                 />
                 <FilterModalContentItem
                   isSelected={type === "public"}
-                  handleClick={() => handleFilter({ type: "public" })}
+                  handleClick={() => filterRepo({ type: "public" }, "type")}
                   labelText="Public"
                 />
                 <FilterModalContentItem
                   isSelected={type === "private"}
-                  handleClick={() => handleFilter({ type: "private" })}
+                  handleClick={() => filterRepo({ type: "private" }, "type")}
                   labelText="Private"
                 />
                 <FilterModalContentItem
                   isSelected={type === "sources"}
-                  handleClick={() => handleFilter({ type: "sources" })}
+                  handleClick={() => filterRepo({ type: "sources" }, "type")}
                   labelText="Sources"
                 />
                 <FilterModalContentItem
                   isSelected={type === "forks"}
-                  handleClick={() => handleFilter({ type: "forks" })}
+                  handleClick={() => filterRepo({ type: "forks" }, "type")}
                   labelText="Forks"
                 />
                 <FilterModalContentItem
                   isSelected={type === "archived"}
-                  handleClick={() => handleFilter({ type: "archived" })}
+                  handleClick={() => filterRepo({ type: "archived" }, "type")}
                   labelText="Archived"
                 />
                 <FilterModalContentItem
                   isSelected={type === "mirrors"}
-                  handleClick={() => handleFilter({ type: "mirrors" })}
+                  handleClick={() => filterRepo({ type: "mirrors" }, "type")}
                   labelText="Mirrors"
                 />
               </FilterModalContent>
@@ -103,52 +121,58 @@ export const Filter = () => {
               >
                 <FilterModalContentItem
                   isSelected={language === ""}
-                  handleClick={() => handleFilter({ language: "" })}
+                  handleClick={() => filterRepo({ language: "" }, "lang")}
                   labelText="All"
                 />
                 <FilterModalContentItem
                   isSelected={language === "html"}
-                  handleClick={() => handleFilter({ language: "html" })}
+                  handleClick={() => filterRepo({ language: "html" }, "lang")}
                   labelText="HTML"
                 />
                 <FilterModalContentItem
                   isSelected={language === "typescript"}
-                  handleClick={() => handleFilter({ language: "typescript" })}
+                  handleClick={() =>
+                    filterRepo({ language: "typescript" }, "lang")
+                  }
                   labelText="TypeScript"
                 />
                 <FilterModalContentItem
                   isSelected={language === "python"}
-                  handleClick={() => handleFilter({ language: "python" })}
+                  handleClick={() => filterRepo({ language: "python" }, "lang")}
                   labelText="Python"
                 />
                 <FilterModalContentItem
                   isSelected={language === "css"}
-                  handleClick={() => handleFilter({ language: "css" })}
+                  handleClick={() => filterRepo({ language: "css" }, "lang")}
                   labelText="CSS"
                 />
                 <FilterModalContentItem
                   isSelected={language === "javascript"}
-                  handleClick={() => handleFilter({ language: "javascript" })}
+                  handleClick={() =>
+                    filterRepo({ language: "javascript" }, "lang")
+                  }
                   labelText="JavaScript"
                 />
                 <FilterModalContentItem
                   isSelected={language === "scss"}
-                  handleClick={() => handleFilter({ language: "scss" })}
+                  handleClick={() => filterRepo({ language: "scss" }, "lang")}
                   labelText="SCSS"
                 />
                 <FilterModalContentItem
                   isSelected={language === "php"}
-                  handleClick={() => handleFilter({ language: "php" })}
+                  handleClick={() => filterRepo({ language: "php" }, "lang")}
                   labelText="PHP"
                 />
                 <FilterModalContentItem
                   isSelected={language === "batchfile"}
-                  handleClick={() => handleFilter({ language: "batchfile" })}
+                  handleClick={() =>
+                    filterRepo({ language: "batchfile" }, "lang")
+                  }
                   labelText="Batchfile"
                 />
                 <FilterModalContentItem
                   isSelected={language === "vue"}
-                  handleClick={() => handleFilter({ language: "vue" })}
+                  handleClick={() => filterRepo({ language: "vue" }, "lang")}
                   labelText="Vue"
                 />
               </FilterModalContent>
@@ -169,12 +193,12 @@ export const Filter = () => {
               >
                 <FilterModalContentItem
                   isSelected={sort === "updated"}
-                  handleClick={() => handleFilter({ sort: "updated" })}
+                  handleClick={() => filterRepo({ sort: "updated" }, "sort")}
                   labelText="Last updated"
                 />
                 <FilterModalContentItem
                   isSelected={sort === "stars"}
-                  handleClick={() => handleFilter({ sort: "stars" })}
+                  handleClick={() => filterRepo({ sort: "stars" }, "sort")}
                   labelText="Stars"
                 />
               </FilterModalContent>
