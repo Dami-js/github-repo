@@ -70,7 +70,7 @@ const Navbar = (props: NavbarProps) => {
                 href="#!"
                 className="hidden md:inline-flex items-center p-1 text-white"
               >
-                <Img src={user.avatar_url} size="5" />
+                <Img src={user.avatar_url} className="w-5" />
                 <CaretDownIcon className="fill-current ml-1" size="7" />
               </a>
             )}
@@ -91,7 +91,7 @@ const Navbar = (props: NavbarProps) => {
               {user && (
                 <MenuLink
                   label="Dami-js"
-                  icon={<Img src={user.avatar_url} size="5" />}
+                  icon={<Img src={user.avatar_url} className="w-5" />}
                 />
               )}
               <MenuLink label="Sign out" icon={<Exit />} />

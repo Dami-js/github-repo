@@ -33,7 +33,7 @@ const Button = ({
 >) => {
   return (
     <button
-      className={`flex items-center justify-center border border-gray-300 rounded-md px-4 py-1.5 ${getButtonColor(
+      className={`flex items-center justify-center border border-gray-300 rounded-md px-4 py-1.5 active:opacity-90 ${getButtonColor(
         variant
       )} text-${size} focus:outline-none ${
         fullWidth ? "w-full" : ""

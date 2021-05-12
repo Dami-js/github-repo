@@ -3,10 +3,15 @@ import React from "react";
 interface ImgProps {
   src: string;
   size?: string;
+  className?: string;
 }
 
-const Img = ({ src, size = "20" }: ImgProps) => {
-  return <img src={src} alt="" className={`rounded-full w-${size}`} />;
+const Img = ({ src, className, size = "20" }: ImgProps) => {
+  return (
+    <div className={`rounded-full ${className}`}>
+      <img src={src} alt="" className="rounded-full w-full" />
+    </div>
+  );
 };
 
 export default Img;

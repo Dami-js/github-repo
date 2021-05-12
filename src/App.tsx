@@ -21,7 +21,7 @@ function App() {
               <div className="flex items-center">
                 {showName && (
                   <div className="flex items-center">
-                    <Img src="/dami.png" size="8" />
+                    <Img src="/dami.png" className="w-8" />
                     <p className="font-semibold text-gray-800 ml-2">Dami-js</p>
                   </div>
                 )}
